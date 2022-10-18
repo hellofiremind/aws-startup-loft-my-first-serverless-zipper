@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Startup Loft Zipper Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+  <meta name="description" content="Firemind - AWS Cloud Specialists. We build your next best thing in the cloud. Advisory &amp; Consulting Services. AI/ML &amp; Data integrated." />
+  <link rel="canonical" href="https://www.firemind.io/" />
+  <meta property="og:locale" content="en_GB" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Firemind - AWS Advanced Cloud Specialists" />
+  <meta property="og:description" content="Firemind - AWS Cloud Specialists. We build your next best thing in the cloud. Advisory &amp; Consulting Services. AI/ML &amp; Data integrated." />
+  <meta property="og:url" content="https://www.firemind.io/" />
+  <meta property="og:site_name" content="Firemind" />
+  <meta property="article:publisher" content="https://www.facebook.com/hellofiremind" />
+  <meta property="article:modified_time" content="2022-09-12T13:09:02+00:00" />
+  <meta property="og:image" content="https://website-assets.cdn.firemind.io/7/wp-content/uploads/2022/03/data_v2_0099-1.jpg" />
+  <meta property="og:image:width" content="1920" />
+  <meta property="og:image:height" content="1080" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Firemind - AWS Advanced Cloud Specialists" />
+  <meta name="twitter:description" content="Firemind - AWS Cloud Specialists. We build your next best thing in the cloud. Advisory &amp; Consulting Services. AI/ML &amp; Data integrated." />
+  <meta name="twitter:image" content="https://website-assets.cdn.firemind.io/7/wp-content/uploads/2022/03/data_v2_0099-1.jpg" />
+  <meta name="twitter:site" content="@hellofiremind" />
+  <meta name="twitter:label1" content="Estimated reading time" />
+  <meta name="twitter:data1" content="6 minutes" />
+</head>
+<body>
+  <div class="px-4 py-5 my-5 text-center">
+    <img class="d-block mx-auto my-4" src="logo_blk.png" alt="Firemind" height="57">
+    <div class="col mx-auto">
+      <a href="https://www.firemind.io/offerings/basecamp/?utm_source=leaderboardbanner&utm_medium=leaderboardbanner&utm_campaign=basecamp&utm_id=basecamp"><img src="banner.jpg" alt="Firemind Basecamp Workshops" class="img-fluid"></a>
+    </div>
+    <h1 class="display-5 pt-4 fw-bold">Serverless Zipping Demo</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Let's request a zip file of the contents of our S3 bucket</p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <button id="start-zipping" type="button" class="btn btn-primary btn-lg px-4">Start zipping</button>
+        <button id="loading-zip" class="btn btn-primary btn-lg px-4 d-none" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Zipping...
+        </button>
+        <button id="download-zip" type="button" class="btn btn-primary btn-lg px-4 d-none">Download the zip</button>
+      </div>
+      <div class="card my-5">
+        <div class="card-header">
+          Logs
+        </div>
+        <div class="card-body">
+          <p class="card-text font-monospace">Hit the start zipping button to get started!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const endpoint = 'https://api.development.awssup-zipper.zipper.aws-sup.development.firemind.io/api/zip/'
+
+    const startZipping = document.querySelector('#start-zipping')
+    const loadingZip = document.querySelector('#loading-zip')
+    const downloadZip = document.querySelector('#download-zip')
+    const logBody = document.querySelector('.card-body')
+
+    const log = (...messages) => {
+      console.log(...messages)
+
+      Array.from(messages).forEach((message) => logBody.insertAdjacentHTML('beforeend', `<p class="card-text font-monospace">${message}</p>`))
+    }
+
+    const sleep = () => new Promise((resolve) => setTimeout(resolve, 5000))
+
+    const getDownload = (signedURL) => {
+      startZipping.classList.add('d-none')
+      loadingZip.classList.add('d-none')
+      downloadZip.classList.remove('d-none')
+
+      downloadZip.addEventListener('click', (event) => {
+        event.preventDefault()
+
+        window.location.href = signedURL
+      })
+    }
+
+    const pollJob = async (jobId) => {
+      let complete
+
+      while (!complete) {
+        log(`Checking completion of job ID ${jobId}`)
+
+        const response = await fetch(`${endpoint}check?job_id=${jobId}`)
+        const json = await response.json()
+
+        complete = json.complete
+
+        if (complete) {
+          log(`Job ID ${jobId} is complete, downloading...`)
+          getDownload(json.signedURL)
+
+          return
+        }
+
+        log(`Job ID ${jobId} not complete yet, sleeping...`)
+        await sleep()
+      }
+    }
+
+    startZipping.addEventListener('click', async (event) => {
+      event.preventDefault()
+
+      log('Requesting a job')
+
+      startZipping.classList.add('d-none')
+      loadingZip.classList.remove('d-none')
+      downloadZip.classList.add('d-none')
+
+      const response = await fetch(`${endpoint}request`, {
+        method: 'POST'
+      })
+      const {jobId} = await response.json()
+
+      log(`Got job ID ${jobId}`)
+
+      pollJob(jobId)
+    })
+  </script>
+</body>
+</html>

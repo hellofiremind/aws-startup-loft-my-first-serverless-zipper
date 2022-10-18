@@ -1,0 +1,22 @@
+{
+  "name": "ecs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ecs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.163.0",
+    "@aws-sdk/client-lambda": "^3.163.0",
+    "@aws-sdk/client-s3": "^3.163.0",
+    "@aws-sdk/client-sqs": "^3.163.0",
+    "@aws-sdk/lib-dynamodb": "^3.163.0",
+    "@aws-sdk/lib-storage": "^3.163.0",
+    "jszip": "^3.10.1",
+    "lodash": "^4.17.21"
+  }
+}

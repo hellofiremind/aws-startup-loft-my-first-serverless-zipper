@@ -1,0 +1,31 @@
+[
+  {
+    "cpu": 256,
+    "environment": [
+      {
+        "name": "SERVICE",
+        "value": "${SERVICE}"
+      },
+      {
+        "name": "STAGE",
+        "value": "${STAGE}"
+      }
+    ],
+    "essential": true,
+    "image": "${IMAGE_ADDR}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/${SERVICE}-${STAGE}-zip-service-task-logs",
+        "awslogs-region": "${REGION}",
+        "awslogs-stream-prefix": "ecs"
+      }
+    },
+    "memory": 512,
+    "name": "${SERVICE}-${STAGE}-zip-service",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX",
+        "cpuArchitecture": "ARM64"
+    }
+  }
+]

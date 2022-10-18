@@ -1,0 +1,78 @@
+service: ${file(package.json):name}
+
+provider:
+  versionFunctions: false
+  name: aws
+  runtime: nodejs16.x
+  architecture: arm64
+  stage: ${opt:stage, 'development'}
+  region: ${env:AWS_DEFAULT_REGION, 'eu-west-1'}
+  timeout: 10
+  memorySize: 128
+  deploymentBucket: ${file(infrastructure/terraform-state.json):serverless_s3_bucket}
+  iam:
+    role: ${file(infrastructure/terraform-state.json):lambda_role_arn}
+  apiGateway:
+    restApiId: ${file(infrastructure/terraform-state.json):api_gateway_rest_api_id}
+    restApiRootResourceId: ${file(infrastructure/terraform-state.json):api_gateway_root_resource_id}
+  environment:
+    REGION: ${self:provider.region}
+    STAGE: ${self:provider.stage}
+    SERVICE: ${self:service}
+
+  tags: ${file(infrastructure/terraform-state.json):tags}
+  stackTags: ${file(infrastructure/terraform-state.json):tags}
+
+functions:
+  zipRequest:
+    handler: src/server/handlers/zip/index.handler
+    events:
+      - http:
+          method: post
+          path: /api/zip/request
+          cors:
+            origin: https://${file(infrastructure/terraform-state.json):frontend_url}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
+      - http:
+          method: get
+          path: /api/zip/check
+          cors:
+            origin: https://${file(infrastructure/terraform-state.json):frontend_url}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
+
+plugins:
+  - serverless-better-credentials
+  - serverless-webpack
+  - serverless-offline
+  - serverless-layers
+
+package:
+  individually: false
+  exclude:
+    - node_modules/**
+  excludeDevDependencies: true
+
+custom:
+  webpack:
+    keepOutputDirectory: true
+    webpackConfig: infrastructure/webpack/webpack.config.server.js
+
+  serverless-layers:
+    dependenciesPath: ./build/server/service/package.json
+
+  serverless-offline:
+    port: 3000
