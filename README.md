@@ -1,6 +1,7 @@
 # AWS Startup Loft "my first serverless zipper"
 
-This repo is part of the startup loft session by Firemind and AWS: https://aws-startup-lofts.com/emea/e/0fe78/aws-startup-academy-are-serverless-containers-right-for-you-running-container-applications-on-ecs-at-scale-no-servers-required-feat-firemind
+This repo is part of the startup loft session by Firemind and AWS: https://aws-startup-lofts.com/emea/e/0fe78/aws-startup-academy-are-serverless-containers-right-for-you-running-container-applications-on-ecs-at-scale-no-servers-required-feat-firemind.
+View a demo here: https://development.awssup-zipper.zipper.aws-sup.development.firemind.io/
 
 ![](diagram.png)
 
