@@ -33,7 +33,7 @@
     "lodash": "^4.17.21",
     "nocache": "^3.0.3",
     "pg-format": "^1.0.4",
-    "regenerator-runtime": "^0.13.9",
+    "regenerator-runtime": "^0.13.11",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
