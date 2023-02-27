@@ -47,7 +47,7 @@
     "@babel/preset-env": "^7.18.10",
     "babel-loader": "^8.2.5",
     "clean-webpack-plugin": "^4.0.0",
-    "eslint": "^8.23.0",
+    "eslint": "^8.35.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-import-resolver-webpack": "^0.13.2",
     "eslint-plugin-import": "^2.26.0",
